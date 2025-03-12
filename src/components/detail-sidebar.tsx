@@ -1,155 +1,44 @@
 "use client"
 
 import * as React from "react"
-import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
-
-import { NavUser } from "@/components/nav-user"
+import { ChevronDown } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
+import { teamLabel } from "@/lib/utils"
+import { Checkbox } from "./ui/checkbox"
+import { useTrackletContext } from "@/context/TrackletContext"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
+export function DetailSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const {
+    uniqueTrackletIds,
+    toggleTracklet,
+    toggleAll,
+    isSelected,
+    uniqueGroundTruthTrackletIds,
+    toggleGroundTruthTracklet,
+    toggleAllGroundTruth,
+    isGroundTruthSelected,
+  } = useTrackletContext()
 
-export function DetailSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // Check if all unique tracklets are selected
+  const allSelected =
+    uniqueTrackletIds.length > 0 &&
+    uniqueTrackletIds.every((item) => isSelected(item.tracklet_id))
+
+  const allGroundTruthSelected =
+    uniqueGroundTruthTrackletIds.length > 0 &&
+    uniqueGroundTruthTrackletIds.every((item) => isGroundTruthSelected(item.tracklet_id))
+
   return (
     <Sidebar
       side="right"
@@ -159,25 +48,139 @@ export function DetailSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">SN-GameState</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
+            <SidebarMenuButton asChild>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="tracklet-all"
+                  checked={allSelected}
+                  onClick={() => toggleAll(!allSelected)}
+                />
+                <label
+                  htmlFor="tracklet-all"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Tracklet
+                </label>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        {
+          // Group tracklets by team and list individual tracklets
+          [...new Set(uniqueTrackletIds.map((item) => item.team))].map(
+            (team, index) => (
+              <Collapsible key={index} defaultOpen className="group/collapsible">
+                <SidebarGroup>
+                  <SidebarGroupLabel asChild>
+                    <CollapsibleTrigger>
+                      {teamLabel.find((o) => o.value === team)?.label}
+                      <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {uniqueTrackletIds
+                          .filter((o) => o.team === team)
+                          .map((item, index) => (
+                            <SidebarMenuItem key={index}>
+                              <SidebarMenuButton asChild>
+                                <div className="flex gap-4">
+                                  <div className="flex shrink">
+                                    <Checkbox
+                                      id={`tracklet-${item.tracklet_id}`}
+                                      checked={isSelected(item.tracklet_id)}
+                                      onClick={() =>
+                                        toggleTracklet(item.tracklet_id)
+                                      }
+                                    />
+                                  </div>
+                                  <label htmlFor={`tracklet-${item.tracklet_id}`} className="flex-1 grow">
+                                    Tracklet {item.tracklet_id}
+                                  </label>
+                                </div>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </SidebarGroup>
+              </Collapsible>
+            )
+          )
+        }
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="tracklet-all-gt"
+                  checked={allGroundTruthSelected}
+                  onClick={() => toggleAllGroundTruth(!allGroundTruthSelected)}
+                />
+                <label
+                  htmlFor="tracklet-all-gt"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Ground Truth Tracklet
+                </label>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        {
+          // Group tracklets by team and list individual tracklets
+          [...new Set(uniqueGroundTruthTrackletIds.map((item) => item.team))].map(
+            (team, index) => (
+              <Collapsible key={index} defaultOpen className="group/collapsible">
+                <SidebarGroup>
+                  <SidebarGroupLabel asChild>
+                    <CollapsibleTrigger>
+                      {teamLabel.find((o) => o.value === team)?.label}
+                      <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {uniqueGroundTruthTrackletIds
+                          .filter((o) => o.team === team)
+                          .map((item, index) => (
+                            <SidebarMenuItem key={index}>
+                              <SidebarMenuButton asChild>
+                                <div className="flex gap-4">
+                                  <div className="flex shrink">
+                                    <Checkbox
+                                      id={`tracklet-${item.tracklet_id}-gt`}
+                                      checked={isGroundTruthSelected(item.tracklet_id)}
+                                      onClick={() =>
+                                        toggleGroundTruthTracklet(item.tracklet_id)
+                                      }
+                                    />
+                                  </div>
+                                  <label htmlFor={`tracklet-${item.tracklet_id}-gt`} className="flex-1 grow">
+                                    Tracklet {item.tracklet_id}
+                                  </label>
+                                </div>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </SidebarGroup>
+              </Collapsible>
+            )
+          )
+        }
+      </SidebarContent>
     </Sidebar>
   )
 }

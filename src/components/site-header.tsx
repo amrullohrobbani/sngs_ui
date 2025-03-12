@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { SidebarIcon } from "lucide-react"
 
 import { SearchForm } from "@/components/search-form"
@@ -8,15 +10,33 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { ChevronDownIcon } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
+import { getFolders } from "@/hooks/get-folders"
+import { useSettings } from "@/context/SettingsContext"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
+  const { settings, setFolder } = useSettings()
+  const [ folders, setFolders ] = useState<string[]>()
+
+  useEffect(() => {
+      async function fetchImages() {
+        const folders = await getFolders();
+        setFolders(folders);
+      }
+      fetchImages();
+    }, [settings.folder]);
 
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b">
@@ -39,7 +59,19 @@ export function SiteHeader() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Data - 1</BreadcrumbPage>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1">
+                  {settings.folder}
+                  <ChevronDownIcon className="scale-75" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {
+                    folders?.map((item, index) => (
+                      <DropdownMenuItem key={index} onClick={() => setFolder(item)}>{item}</DropdownMenuItem>
+                    ))
+                  }
+                </DropdownMenuContent>
+              </DropdownMenu>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
