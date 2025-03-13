@@ -12,8 +12,6 @@ import { TrackletProvider } from "@/context/TrackletContext"
 import { AnnotationProvider } from "@/context/AnnotationContext"
 import { SettingsProvider } from "@/context/SettingsContext"
 
-export const iframeHeight = "800px"
-
 export default async function Page() {  
   return (
     <div className="[--header-height:calc(--spacing(14))]">

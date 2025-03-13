@@ -2,9 +2,11 @@
   "name": "sngs_ui",
   "version": "0.1.0",
   "private": true,
+  "author": "Muhammad Amrulloh Robbani",
+  "description": "SNGS UI development",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev --turbopack\" \"electron -P tsconfig.electron.cjs ./electron/main.ts\"",
+    "build": "next build && electron-builder",
     "start": "next start",
     "lint": "next lint"
   },
@@ -22,6 +24,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "electron-serve": "^2.1.1",
     "fs": "^0.0.1-security",
     "lucide-react": "^0.477.0",
     "next": "15.2.1",
@@ -36,12 +39,17 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/electron": "^1.4.38",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

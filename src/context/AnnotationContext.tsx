@@ -78,7 +78,7 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
     }
 
     fetchAnnotations()
-  }, [])
+  }, [settings.folder])
 
   return (
     <AnnotationContext.Provider value={{ annotations }}>
