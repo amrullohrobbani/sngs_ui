@@ -59,6 +59,27 @@ By default, the application will be accessible at:
 http://localhost:3000
 ```
 
+## Adding Tracklet Files
+To visualize the tracklet data, you need to prepare and organize the files in the following structure:
+
+```
+tracklet_data/
+│── original_frame/        # Folder containing all frame images
+│── labels-gt.json         # Ground truth tracklet file
+│── track-data.txt         # Prediction tracklet file
+│── court-track-data.txt   # Court prediction tracklet file
+```
+
+### Steps to Add Tracklet Files:
+1. Create a folder (e.g., `tracklet_data/`).
+2. Inside this folder, create a subfolder `original_frame/` and put all the frame images there.
+3. Place the following files inside `tracklet_data/`:
+   - `labels-gt.json`: Contains the ground truth tracklet data.
+   - `track-data.txt`: Contains the predicted tracklet data.
+   - `court-track-data.txt`: Contains the court prediction tracklet data.
+
+Make sure the file names match exactly as shown above to ensure compatibility with the visualization tool.
+
 ## Contributing
 Feel free to fork this project, submit issues, and contribute to its development.
 
