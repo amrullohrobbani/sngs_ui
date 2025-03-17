@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SNGS - UI
 
-## Getting Started
+SNGS - UI is a tool designed to visualize gamestate reconstruction tracklets. It provides features to display bounding boxes and tracking lines, with the ability to toggle visibility and compare between ground truth and prediction.
 
-First, run the development server:
+## Features
+- Visualize bounding boxes and tracking lines for each tracklet.
+- Toggle visibility of bounding boxes and tracking lines as needed.
+- Compare between ground truth and prediction for better analysis.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Installation
+
+### Step 1: Install NVM (Node Version Manager)
+To install NVM, follow these steps:
+
+#### **For Linux/macOS:**
+1. Open a terminal.
+2. Run the following command:
+   ```sh
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+   ```
+3. Restart your terminal or run:
+   ```sh
+   source ~/.bashrc
+   ```
+4. Verify installation by running:
+   ```sh
+   nvm --version
+   ```
+
+#### **For Windows:**
+1. Download the [NVM for Windows](https://github.com/coreybutler/nvm-windows/releases) installer.
+2. Run the installer and follow the setup instructions.
+3. Restart your terminal and check the installation with:
+   ```sh
+   nvm version
+   ```
+
+### Step 2: Clone the Project
+Clone the repository using Git:
+```sh
+git clone <repository_url>
+cd sngs-ui
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Step 3: Install Dependencies
+Run the following command to install the required dependencies:
+```sh
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Running the Project
+To start the development server, run:
+```sh
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+By default, the application will be accessible at:
+```
+http://localhost:3000
+```
 
-## Learn More
+## Contributing
+Feel free to fork this project, submit issues, and contribute to its development.
 
-To learn more about Next.js, take a look at the following resources:
+## License
+This project is licensed under [MIT License](LICENSE).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Enjoy using **SNGS - UI**!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
