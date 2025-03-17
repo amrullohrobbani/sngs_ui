@@ -1,9 +1,12 @@
-// electron/main.ts
-
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import { exec } from 'child_process';
+import { fileURLToPath } from 'url';
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow = null;
+let nextServer = null;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -16,8 +19,7 @@ function createWindow() {
     },
   });
 
-  // Make sure to point this to your Next.js app's URL (localhost in dev mode)
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadURL(`file://${path.join(__dirname, '.next/server/pages/index.html')}`); // Load the Next.js app
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -25,6 +27,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Start the Next.js production server
+  nextServer = exec('npm run start', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error starting Next.js: ${error}`);
+    }
+    console.log(stdout);
+    console.error(stderr);
+  });
+
   createWindow();
 
   app.on('activate', () => {
@@ -35,6 +46,9 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+  if (nextServer) {
+    nextServer.kill(); // Kill the Next.js server when Electron quits
+  }
   if (process.platform !== 'darwin') {
     app.quit();
   }
