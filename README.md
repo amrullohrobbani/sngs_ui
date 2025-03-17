@@ -26,6 +26,14 @@ To install NVM, follow these steps:
    ```sh
    nvm --version
    ```
+5. Install the Node:
+   ```sh
+   nvm install --lts
+   ```
+6. Verify Node installation by running:
+   ```sh
+   node -v
+   ```
 
 #### **For Windows:**
 1. Download the [NVM for Windows](https://github.com/coreybutler/nvm-windows/releases) installer.
@@ -77,6 +85,7 @@ tracklet_data/
    - `labels-gt.json`: Contains the ground truth tracklet data.
    - `track-data.txt`: Contains the predicted tracklet data.
    - `court-track-data.txt`: Contains the court prediction tracklet data.
+4. put the `tracklet_data` folder inside folder `public/data/`
 
 Make sure the file names match exactly as shown above to ensure compatibility with the visualization tool.
 
