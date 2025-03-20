@@ -15,6 +15,27 @@ interface AnnotationProviderProps {
   children: ReactNode
 }
 
+export interface Annotation {
+  image_id: string;
+  track_id: string;
+  supercategory: string;
+  bbox_image: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  bbox_pitch: {
+    x_bottom_middle: number;
+    y_bottom_middle: number;
+  }
+  attributes: {
+    role: string;
+    jersey: string;
+    team: string;
+  };
+}
+
 export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children }) => {
   const [annotations, setAnnotations] = useState<DataItem[]>([])
 
@@ -31,28 +52,6 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
         // Extract the annotations array from the JSON object.
         // Here we assume the property is named "annotations" (plural)
         const rawAnnotations = json.annotations
-
-        // Map each annotation item to a DataItem
-        interface Annotation {
-          image_id: string;
-          track_id: string;
-          supercategory: string;
-          bbox_image: {
-            x: number;
-            y: number;
-            w: number;
-            h: number;
-          };
-          bbox_pitch: {
-            x_bottom_middle: number;
-            y_bottom_middle: number;
-          }
-          attributes: {
-            role: string;
-            jersey: string;
-            team: string;
-          };
-        }
 
         const parsedAnnotations: DataItem[] = rawAnnotations.filter((ann: Annotation) => ann.supercategory === 'object').map((ann: Annotation) => ({
           // Using image_id as a proxy for frame (or set to 0 if unavailable)

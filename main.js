@@ -1,12 +1,29 @@
-import { app, BrowserWindow } from 'electron';
+import { app, protocol, BrowserWindow } from 'electron';
 import path from 'path';
 import { exec } from 'child_process';
-import { fileURLToPath } from 'url';
+// import { fileURLToPath } from 'url';
 
 let mainWindow = null;
 let nextServer = null;
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+
+import { createHandler } from 'next-electron-rsc';
+
+const appPath = app.getAppPath();
+const isDev = process.env.NODE_ENV === 'development';
+const localhostUrl = 'http://localhost:3000'; // must match Next.js dev server
+
+// change to your path, make sure it's added to Electron Builder files
+const standaloneDir = path.join(appPath, '.next', 'standalone', 'demo');
+
+const { createInterceptor } = createHandler({
+  standaloneDir,
+  staticDir,
+  localhostUrl,
+  protocol,
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -19,7 +36,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL(`file://${path.join(__dirname, '.next/server/pages/index.html')}`); // Load the Next.js app
+  mainWindow.loadURL(`http://localhost:3000`); // Load the Next.js app
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -41,6 +58,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
+      if (!isDev) createInterceptor({ session: mainWindow.webContents.session });
     }
   });
 });

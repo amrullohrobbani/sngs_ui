@@ -34,9 +34,12 @@ export function SiteHeader() {
       async function fetchImages() {
         const folders = await getFolders();
         setFolders(folders);
+        if(!folders.includes(settings.folder)) {
+          setFolder(folders[0])
+        }
       }
       fetchImages();
-    }, [settings.folder]);
+    }, [setFolder, settings.folder]);
 
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b">
