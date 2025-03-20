@@ -46,7 +46,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           text = await response.text()
         } else if (fileExtension === 'json') {
             const jsonData = await response.json()
-            console.log(jsonData)
             text = jsonData?.predictions.map((ann: Annotation) => 
             `${ann.image_id.substring(5)},${ann.track_id},${ann.bbox_image?.x},${ann.bbox_image?.y},${ann.bbox_image?.w},${ann.bbox_image?.h},0,${ann.attributes?.role},${ann.attributes?.jersey},${ann.attributes?.team === 'left' ? 1 : ann.attributes?.team === 'right' ? 0 : -1}`
             ).join('\n')
@@ -57,9 +56,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
         // Split the text by newlines and filter out empty rows
         const rows = text.split('\n').filter((row: string) => row.trim() !== '')
-        console.log(rows)
-
-        const court_file_data = await getFile(`public/data/${settings.folder}`, 'track')
+        const court_file_data = await getFile(`public/data/${settings.folder}`, 'court')
         const fileExtensionCourt = court_file_data ? court_file_data.split('.').pop()?.toLowerCase() : null;
         const response_court = await fetch((court_file_data || '').split('/').slice(1).join('/'))
         
