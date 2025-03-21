@@ -32,7 +32,7 @@ export function SiteHeader() {
 
   useEffect(() => {
       async function fetchImages() {
-        const folders = await getFolders();
+        const folders = await getFolders(window.location.pathname || '');
         setFolders(folders);
         if(!folders.includes(settings.folder)) {
           setFolder(folders[0])

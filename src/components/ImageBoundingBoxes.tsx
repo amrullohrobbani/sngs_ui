@@ -128,7 +128,7 @@ export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: Ima
                     <ResizableHandle className='bg-transparent' />
                     <ResizablePanel defaultSize={26}>
                     <ResizablePanel defaultSize={100}>
-                        <Minimap src={'/Radar.png'} boxes={boxes} gtdata={gtdata} currentIndex={currentIndex} className='opacity-70 brightness-90' />
+                        <Minimap src={'/Radar.png'} boxes={boxes} gtdata={gtdata} currentIndex={currentIndex} className='opacity-80 hover:opacity-100 brightness-90' />
                     </ResizablePanel>
                     </ResizablePanel>
                 </ResizablePanelGroup>

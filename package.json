@@ -31,6 +31,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "csv-parser": "^3.2.0",
     "electron-serve": "^2.1.1",
     "fs": "^0.0.1-security",
     "lucide-react": "^0.477.0",
