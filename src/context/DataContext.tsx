@@ -1,9 +1,12 @@
 "use client"
+
 // context/DataContext.tsx
 import React, { createContext, useState, useEffect, ReactNode } from 'react'
 import { useSettings } from './SettingsContext'
 import { getFile } from '@/hooks/get-file'
 import { Annotation } from './AnnotationContext'
+import { calcPlayerVelocities } from '@/hooks/get-velocity'
+import { getFolders } from '@/hooks/get-folders'
 
 export interface DataItem {
   frame: number         // consider keeping it as a string if leading zeros matter
@@ -17,7 +20,10 @@ export interface DataItem {
   score: number
   role: string
   jersey_number: number
-  team: number
+  team: number,
+  vx?: number; // Velocity in x direction
+  vy?: number; // Velocity in y direction
+  speed?: number; // Total speed
 }
 
 interface DataContextProps {
@@ -37,6 +43,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const folders = await getFolders();
+        if (!folders.includes(settings.folder)) {
+          return
+        }
         // Fetch the text file from the public folder (e.g. /data.txt)
         const track_file_data = await getFile(`public/data/${settings.folder}`, 'track')
         const fileExtension = track_file_data ? track_file_data.split('.').pop()?.toLowerCase() : null;
@@ -162,8 +172,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
               return null; // Handle unexpected row format
           }
         }).filter((item: null) => item !== null); // Remove any null values
-      
-        setData(parsedData)
+        
+        const finalData =  await calcPlayerVelocities(parsedData)
+        setData(finalData)
       } catch (error) {
         console.error('Error fetching or parsing data:', error)
       }

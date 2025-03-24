@@ -4,6 +4,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react'
 import { DataItem } from './DataContext'
 import { useSettings } from './SettingsContext'
+import { getFolders } from '@/hooks/get-folders'
 
 interface AnnotationContextType {
   annotations: DataItem[]
@@ -43,8 +44,11 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
 
   useEffect(() => {
     const fetchAnnotations = async () => {
-
       try {
+        const folders = await getFolders();
+        if (!folders.includes(settings.folder)) {
+          return
+        }
         // Fetch the JSON file from the public folder (e.g. /annotation.json)
         const response = await fetch(`/data/${settings.folder}/labels-gt.json`)
         const json = await response.json()

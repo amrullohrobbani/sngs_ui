@@ -62,16 +62,29 @@ export const BoxVisualization = memo(function BoxVisualization({ box, index, con
     >
       {
         isMinimap?
-          <Avatar className={clsx(
-            'relative left-[-0.95rem] bottom-[1.1rem] text-lg text-white px-1 whitespace-nowrap scale-45 border-white border',
-            { 'bg-red-500': (box.team == 1) },
-            { 'bg-blue-500': (box.team == 0) },
-            { 'bg-yellow-500': (box.team == -1) },
-          )}>
-            <AvatarFallback className='bg-transparent'>
-              {box.role.toLowerCase() == "player" && box.jersey_number !== 100? box.jersey_number.toString() : "  "}
-            </AvatarFallback>
-          </Avatar>
+          <>
+            {/* <div
+              className={
+                clsx(
+                  'absolute h-0.5 bg-amber-400 origin-left',
+                )
+              }
+              style={{
+                width: `${(Math.sqrt((box.vx ?? 0) * (box.vx ?? 0) + (box.vy ?? 0) * (box.vy ?? 0)))*10}px`,
+                transform: `rotate(${Math.atan2(box.vy ?? 0, box.vx ?? 0)}rad)`,
+              }}
+            /> */}
+            <Avatar className={clsx(
+              'absolute origin-top-left -top-1.5 -left-1.5 text-lg text-white px-1 whitespace-nowrap scale-45 border-white border',
+              { 'bg-red-500': (box.team == 1) },
+              { 'bg-blue-500': (box.team == 0) },
+              { 'bg-yellow-500': (box.team == -1) },
+            )}>
+              <AvatarFallback className='bg-transparent'>
+                {box.role.toLowerCase() == "player" && box.jersey_number !== 100? box.jersey_number.toString() : "  "}
+              </AvatarFallback>
+            </Avatar>
+          </>
         :
         <span
           className={clsx(

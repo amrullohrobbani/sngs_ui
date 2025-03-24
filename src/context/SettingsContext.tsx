@@ -31,7 +31,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     trackingLinePredictionTracklet: false,
     trackingLineGTTracklet: false,
     minimap: false,
-    folder: 'Data-1'
+    folder: ''
   })
 
   const toggleSetting = (key: keyof SettingsItem) => {

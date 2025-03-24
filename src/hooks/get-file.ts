@@ -39,5 +39,7 @@ export async function getFile(directory: string, searchType: 'court' | 'labels' 
       break
   }
   // Return the path of the first matching file or null if no file matches
-  return filteredFiles.length > 0 ? path.join(directory, filteredFiles[0]) : null
+  return filteredFiles.length > 0 
+    ? path.join(directory, filteredFiles.find(file => file.endsWith('.json')) || filteredFiles[0]) 
+    : null;
 }

@@ -172,6 +172,7 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
         };
     }, []);
 
+
     return (
         <div className="relative inline-block w-full h-full">
             <Image
@@ -249,7 +250,9 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
                         isSelected={isSelected}
                         isMinimap
                     />
-                ))}
+                ))
+            }
+
             {settings.groundTruthTracklet &&
                 gtdata?.map((box, index) => (
                     <BoxVisualization
@@ -261,7 +264,8 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
                         isGT
                         isMinimap
                     />
-                ))}
+                ))
+            }
         </div>
     );
 }
