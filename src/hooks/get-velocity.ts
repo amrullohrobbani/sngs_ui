@@ -1,12 +1,12 @@
 import { DataItem as VelocityData } from "@/context/DataContext";
    
   // Remove existing velocity data from the team array
-function removePlayerVelocities(team: VelocityData[]): VelocityData[] {
-    return team.map((entry) => {
-        const { vx, vy, speed, ...cleanedEntry } = entry; // Remove vx, vy, speed (and others if added like ax, ay)
-        return cleanedEntry as VelocityData;
-    });
-}
+  function removePlayerVelocities(team: VelocityData[]): VelocityData[] {
+      return team.map((entry) => {
+          const { vx, vy, speed, ...cleanedEntry } = entry; // Remove vx, vy, speed (and others if added like ax, ay)
+          return cleanedEntry as VelocityData;
+      });
+  }
   
   // Savitzky-Golay filter implementation (simplified for linear polynomial, polyorder=1)
   function savitzkyGolayFilter(data: (number | undefined)[], window: number, polyorder: number = 1): (number | undefined)[] {
@@ -137,6 +137,7 @@ function removePlayerVelocities(team: VelocityData[]): VelocityData[] {
   
       // Apply smoothing if enabled
       if (smoothing) {
+        console.log(filter)
         if (filter === 'Savitzky-Golay') {
           const smoothedVx = savitzkyGolayFilter(vx, window, polyorder);
           const smoothedVy = savitzkyGolayFilter(vy, window, polyorder);

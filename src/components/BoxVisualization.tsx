@@ -63,17 +63,55 @@ export const BoxVisualization = memo(function BoxVisualization({ box, index, con
       {
         isMinimap?
           <>
-            {/* <div
-              className={
-                clsx(
-                  'absolute h-0.5 bg-amber-400 origin-left',
-                )
-              }
-              style={{
-                width: `${(Math.sqrt((box.vx ?? 0) * (box.vx ?? 0) + (box.vy ?? 0) * (box.vy ?? 0)))*10}px`,
-                transform: `rotate(${Math.atan2(box.vy ?? 0, box.vx ?? 0)}rad)`,
-              }}
-            /> */}
+            {
+              settings.arrowVelocity && (
+                <div
+                  className={
+                    clsx(
+                      'absolute h-0.5 bg-amber-400 origin-left',
+                      { 'bg-red-500': (box.team == 1) },
+                      { 'bg-blue-500': (box.team == 0) },
+                      { 'bg-yellow-500': (box.team == -1) },
+                    )
+                  }
+                  style={{
+                    width: `${(Math.sqrt((box.vx ?? 0) * (box.vx ?? 0) + (box.vy ?? 0) * (box.vy ?? 0)))*10}px`,
+                    transform: `rotate(${Math.atan2(box.vy ?? 0, box.vx ?? 0)}rad)`,
+                  }}
+                >
+                  <div className={
+                    clsx(
+                      "relative origin-bottom-right h-0.5 rotate-45 flex justify-end"
+                      )
+                    }
+                  >
+                    <div className={
+                      clsx(
+                            'w-2 bg-amber-400',
+                            { 'bg-red-500': (box.team == 1) },
+                            { 'bg-blue-500': (box.team == 0) },
+                            { 'bg-yellow-500': (box.team == -1) },
+                          )
+                      } />
+                  </div>
+                  <div className={
+                    clsx(
+                      "relative origin-bottom-right bottom-0.5 -right-0.25 h-0.5 -rotate-45 flex justify-end"
+                      )
+                    }
+                  >
+                    <div className={
+                      clsx(
+                            'w-2 bg-amber-400',
+                            { 'bg-red-500': (box.team == 1) },
+                            { 'bg-blue-500': (box.team == 0) },
+                            { 'bg-yellow-500': (box.team == -1) },
+                          )
+                      } />
+                  </div>
+                </div>
+              )
+            }
             <Avatar className={clsx(
               'absolute origin-top-left -top-1.5 -left-1.5 text-lg text-white px-1 whitespace-nowrap scale-45 border-white border',
               { 'bg-red-500': (box.team == 1) },
@@ -81,7 +119,7 @@ export const BoxVisualization = memo(function BoxVisualization({ box, index, con
               { 'bg-yellow-500': (box.team == -1) },
             )}>
               <AvatarFallback className='bg-transparent'>
-                {box.role.toLowerCase() == "player" && box.jersey_number !== 100? box.jersey_number.toString() : "  "}
+                {box.role.toLowerCase() == "player" && box.jersey_number !== 100? box.jersey_number.toString() : "  "} 
               </AvatarFallback>
             </Avatar>
           </>
@@ -94,7 +132,9 @@ export const BoxVisualization = memo(function BoxVisualization({ box, index, con
             { 'bg-yellow-500': (box.team == -1) },
             isGT ? 'bottom-2' : 'bottom-5'
           )}>
-          {isGT ? "GT" : ''} {box.tracklet_id} {box.role} - {box.jersey_number}
+          {isGT ? "GT" : ''} {box.tracklet_id}{" - "}
+          {box.team === 1 ? "Left" : box.team === 0 ? "Right" : ''}{" • "}
+          {box.role.charAt(0).toUpperCase() + box.role.slice(1)} - {box.jersey_number} {}
         </span>
       }
     </div>

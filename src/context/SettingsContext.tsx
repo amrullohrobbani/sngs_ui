@@ -8,14 +8,17 @@ export type SettingsItem = {
   trackingLinePredictionTracklet: boolean
   trackingLineGTTracklet: boolean
   minimap: boolean
+  arrowVelocity: boolean
   folder: string
-  [key:string]: boolean | string
+  frame: number
+  [key: string]: boolean | string | number
 }
 
 type SettingsContextType = {
   settings: SettingsItem
   toggleSetting: (key: keyof SettingsItem) => void
   setFolder: (foldername: string) => void
+  setFrame: (frame: number) => void
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -30,8 +33,10 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     groundTruthTracklet: true,
     trackingLinePredictionTracklet: false,
     trackingLineGTTracklet: false,
+    arrowVelocity: false,
     minimap: false,
-    folder: ''
+    folder: '',
+    frame: 0
   })
 
   const toggleSetting = (key: keyof SettingsItem) => {
@@ -47,9 +52,16 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       folder: foldername,
     }))
   }
+  
+  const setFrame = (frame: number) => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      frame: frame,
+    }))
+  }
 
   return (
-    <SettingsContext.Provider value={{ settings, toggleSetting, setFolder }}>
+    <SettingsContext.Provider value={{ settings, toggleSetting, setFolder, setFrame }}>
       {children}
     </SettingsContext.Provider>
   )

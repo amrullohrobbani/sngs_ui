@@ -1,6 +1,7 @@
 "use client";
 import { DataItem } from '@/context/DataContext';
 import { useSettings } from '@/context/SettingsContext';
+import { getPreviousElements } from '@/lib/utils';
 import clsx from 'clsx';
 import { JSX } from 'react';
 
@@ -51,7 +52,7 @@ export function TrackingLineDivs({ boxes, containerSize, isSelected, isGT, curre
   Object.entries(grouped).forEach(([trackletId, trackBoxes]) => {
     // Optionally filter by currentIndex.
     const displayBoxes = currentIndex !== undefined
-      ? trackBoxes.slice(0, currentIndex + 1)
+      ? getPreviousElements(trackBoxes.slice(0, currentIndex + 1), currentIndex, settings.frame)
       : trackBoxes;
 
     // Only create segments if there are at least 2 points.

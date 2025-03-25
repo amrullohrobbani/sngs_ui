@@ -66,7 +66,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
         // Split the text by newlines and filter out empty rows
         const rows = text.split('\n').filter((row: string) => row.trim() !== '')
-        const court_file_data = await getFile(`public/data/${settings.folder}`, 'court')
+        const court_file_data = await getFile(`public/data/${settings.folder}`, fileExtension === 'txt'? 'court': 'track')
         const fileExtensionCourt = court_file_data ? court_file_data.split('.').pop()?.toLowerCase() : null;
         const response_court = await fetch((court_file_data || '').split('/').slice(1).join('/'))
         
@@ -103,12 +103,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
             };
           });
         } else if (fileExtensionCourt === 'json') {
+          const pitchHeight = 68 + 2 * 5
+          const pitchWidth = 105 + 2 * 10
           const jsonDataCourt = await response_court.json()
           parsedData_court = jsonDataCourt.predictions.map((ann: Annotation) => ({
             frame: parseInt(ann.image_id.substring(4), 10) || 0,
             tracklet_id: ann.track_id,
-            x: ann.bbox_pitch?.x_bottom_middle,
-            y: ann.bbox_pitch?.y_bottom_middle,
+            x: ((ann.bbox_pitch?.x_bottom_middle + pitchWidth / 2) / pitchWidth) * pitchWidth,
+            y: ((ann.bbox_pitch?.y_bottom_middle + pitchHeight / 2) / pitchHeight) * pitchHeight,
             w: 0,
             h: 0,
             score: 0, // No score provided in the JSON, so default to 0
@@ -173,7 +175,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           }
         }).filter((item: null) => item !== null); // Remove any null values
         
-        const finalData =  await calcPlayerVelocities(parsedData)
+        const finalData =  await calcPlayerVelocities(parsedData, true, 'moving average', 12)
         setData(finalData)
       } catch (error) {
         console.error('Error fetching or parsing data:', error)

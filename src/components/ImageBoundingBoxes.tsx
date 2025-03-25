@@ -14,6 +14,7 @@ import {
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
 import clsx from 'clsx';
+import { analyzeTeamTendencies } from '@/lib/utils';
 
 interface ImageWithBoundingBoxesProps {
   src: string;
@@ -266,6 +267,20 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
                     />
                 ))
             }
+            
+            <div className="absolute bottom-0 w-full justify-center">
+                {(() => {
+                    const tendencies = analyzeTeamTendencies(data);
+                    return (
+                        <div className='grid grid-cols-2 text-white w-full px-16'>
+                            <p>Left Team Tendency: {tendencies.leftTeamTendency} {tendencies.leftTeamAverageVx.toFixed(2)}</p>
+                            <p>Right Team Tendency: {tendencies.rightTeamTendency} {tendencies.rightTeamAverageVx.toFixed(2)}</p>
+                            {/* <p>Actual Left Team: {tendencies.actualLeftTeam}</p>
+                            <p>Actual Right Team: {tendencies.actualRightTeam}</p> */}
+                        </div>
+                    );
+                })()}
+            </div>
         </div>
     );
 }

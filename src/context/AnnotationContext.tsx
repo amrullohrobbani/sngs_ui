@@ -5,6 +5,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react'
 import { DataItem } from './DataContext'
 import { useSettings } from './SettingsContext'
 import { getFolders } from '@/hooks/get-folders'
+import { getFile } from '@/hooks/get-file'
 
 interface AnnotationContextType {
   annotations: DataItem[]
@@ -50,7 +51,8 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
           return
         }
         // Fetch the JSON file from the public folder (e.g. /annotation.json)
-        const response = await fetch(`/data/${settings.folder}/labels-gt.json`)
+        const track_file_data = await getFile(`public/data/${settings.folder}`, 'labels')
+        const response = await fetch((track_file_data || '').split('/').slice(1).join('/'))
         const json = await response.json()
 
         // Extract the annotations array from the JSON object.

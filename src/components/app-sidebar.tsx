@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Checkbox } from "./ui/checkbox"
+import { Input } from "./ui/input"
 import { useSettings } from '@/context/SettingsContext'
 
 const data = {
@@ -44,12 +45,16 @@ const data = {
     {
       id: 'minimap',
       label: 'Minimap',
+    },
+    {
+      id: 'arrowVelocity',
+      label: 'Velocity Arrow',
     }
   ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { settings, toggleSetting } = useSettings();
+  const { settings, toggleSetting, setFrame } = useSettings();
 
   return (
     <Sidebar
@@ -100,6 +105,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
+        <div className="flex flex-col px-3">
+          <label htmlFor="frame-number">Frame Number</label>
+          <Input id="frame-number" type="number" value={settings.frame} onChange={(val) => setFrame(Number(val.target.value))}/>
+        </div>
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
