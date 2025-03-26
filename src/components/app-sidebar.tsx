@@ -2,15 +2,11 @@
 
 import * as React from "react"
 import {
-  Command,
-} from "lucide-react"
-
-import { NavUser } from "@/components/nav-user"
-import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,6 +14,8 @@ import {
 import { Checkbox } from "./ui/checkbox"
 import { Input } from "./ui/input"
 import { useSettings } from '@/context/SettingsContext'
+import { Tree } from "./ui/tree"
+import { getDataDirectories } from "@/hooks/get-folders"
 
 const data = {
   user: {
@@ -55,62 +53,68 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { settings, toggleSetting, setFrame } = useSettings();
+  const [ directories, setDirectories ] = React.useState<(string | (string | (string | string[])[])[])[]>([])
+  
+  React.useEffect(() => {
+    async function fetchDirectories() {
+      const directories = await getDataDirectories();
+      setDirectories(directories as (string | (string | (string | string[])[])[])[]);
+    }
+    fetchDirectories();
+  }, []);
 
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">SN-GameState</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu>
-          {data.settings
-            .map((item, index) => (
-              <SidebarMenuItem key={index}>
-                <SidebarMenuButton asChild>
-                  <div className="flex gap-4">
-                    <div className="flex shrink">
-                      <Checkbox
-                        id={`tracklet-${item.id}-gt`}
-                        checked={Boolean(settings[`${item.id}`])}
-                        onClick={() =>
-                          toggleSetting(item.id)
-                        }
-                        className="bg-muted"
-                      />
-                    </div>
-                    <label htmlFor={`tracklet-${item.id}-gt`} className="flex-1 grow">
-                      {item.label}
-                    </label>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-        </SidebarMenu>
+        <SidebarGroup>
+          <SidebarGroupLabel>Files</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {data.settings
+                .map((item, index) => (
+                  <SidebarMenuItem key={index}>
+                    <SidebarMenuButton asChild>
+                      <div className="flex gap-4">
+                        <div className="flex shrink">
+                          <Checkbox
+                            id={`tracklet-${item.id}-gt`}
+                            checked={Boolean(settings[`${item.id}`])}
+                            onClick={() =>
+                              toggleSetting(item.id)
+                            }
+                            className="bg-muted"
+                          />
+                        </div>
+                        <label htmlFor={`tracklet-${item.id}-gt`} className="flex-1 grow">
+                          {item.label}
+                        </label>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+            <SidebarMenu>
+              <div className="flex flex-col px-3">
+                <label htmlFor="frame-number" className="text-sm">Frame Number</label>
+                <Input id="frame-number" type="number" value={settings.frame} onChange={(val) => setFrame(Number(val.target.value))}/>
+              </div>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Files</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {directories.map((item, index) => (
+                <Tree key={index} item={item}/>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <div className="flex flex-col px-3">
-          <label htmlFor="frame-number">Frame Number</label>
-          <Input id="frame-number" type="number" value={settings.frame} onChange={(val) => setFrame(Number(val.target.value))}/>
-        </div>
-        <NavUser user={data.user} />
-      </SidebarFooter>
     </Sidebar>
   )
 }

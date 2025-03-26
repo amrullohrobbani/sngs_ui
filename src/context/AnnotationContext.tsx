@@ -46,12 +46,14 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
   useEffect(() => {
     const fetchAnnotations = async () => {
       try {
-        const folders = await getFolders();
-        if (!folders.includes(settings.folder)) {
+        if (settings.folder === "") {
           return
         }
         // Fetch the JSON file from the public folder (e.g. /annotation.json)
-        const track_file_data = await getFile(`public/data/${settings.folder}`, 'labels')
+        const track_file_data = await getFile(`public/data${settings.folder}`, 'labels')
+        if(!track_file_data){
+          return
+        }
         const response = await fetch((track_file_data || '').split('/').slice(1).join('/'))
         const json = await response.json()
 

@@ -43,12 +43,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const folders = await getFolders();
-        if (!folders.includes(settings.folder)) {
+        if (settings.folder === "") {
           return
         }
         // Fetch the text file from the public folder (e.g. /data.txt)
-        const track_file_data = await getFile(`public/data/${settings.folder}`, 'track')
+        const track_file_data = await getFile(`public/data${settings.folder}`, 'track')
         const fileExtension = track_file_data ? track_file_data.split('.').pop()?.toLowerCase() : null;
         const response = await fetch((track_file_data || '').split('/').slice(1).join('/'))
         let text = null

@@ -5,7 +5,7 @@ import path from 'path';
 
 export async function getImages(folder: string) {
   // Define the base directory based on the folder parameter
-  const baseDir = path.join(process.cwd(), `public/data/${folder}`);
+  const baseDir = path.join(process.cwd(), `public/data${folder}`);
 
   // Find all items in the base directory and filter for directories
   const subFolders = fs.readdirSync(baseDir).filter((item) => {
@@ -27,5 +27,5 @@ export async function getImages(folder: string) {
   );
 
   // Return the paths relative to the public folder
-  return imageFiles.map((fileName) => `/data/${folder}/${randomFolder}/${fileName}`);
+  return imageFiles.map((fileName) => `/data${folder}/${randomFolder}/${fileName}`);
 }
