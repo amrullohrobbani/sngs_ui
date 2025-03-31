@@ -132,9 +132,10 @@ export const BoxVisualization = memo(function BoxVisualization({ box, index, con
             { 'bg-yellow-500': (box.team == -1) },
             isGT ? 'bottom-2' : 'bottom-5'
           )}>
-          {isGT ? "GT" : ''} {box.tracklet_id}{" - "}
-          {box.team === 1 ? "Left" : box.team === 0 ? "Right" : ''}{" • "}
-          {box.role.charAt(0).toUpperCase() + box.role.slice(1)} - {box.jersey_number} {}
+          {isGT ? "GT" : ''} {box.tracklet_id + " - "}
+          {box.team === 1 ? "Left • " : box.team === 0 ? "Right • " : ''}
+          {/* {box.color !== "null" ? box.color + " " : ''} */}
+          {box.role.charAt(0).toUpperCase() + box.role.slice(1)} - {box.jersey_number}
         </span>
       }
     </div>

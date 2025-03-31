@@ -6,7 +6,6 @@ import { useSettings } from './SettingsContext'
 import { getFile } from '@/hooks/get-file'
 import { Annotation } from './AnnotationContext'
 import { calcPlayerVelocities } from '@/hooks/get-velocity'
-import { getFolders } from '@/hooks/get-folders'
 
 export interface DataItem {
   frame: number         // consider keeping it as a string if leading zeros matter
@@ -15,12 +14,13 @@ export interface DataItem {
   y: number
   w: number
   h: number
-  x_pitch: number,
-  y_pitch: number,
+  x_pitch: number
+  y_pitch: number
   score: number
   role: string
+  color?: string
   jersey_number: number
-  team: number,
+  team: number
   vx?: number; // Velocity in x direction
   vy?: number; // Velocity in y direction
   speed?: number; // Total speed
@@ -56,7 +56,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         } else if (fileExtension === 'json') {
             const jsonData = await response.json()
             text = jsonData?.predictions.map((ann: Annotation) => 
-            `${ann.image_id.substring(5)},${ann.track_id},${ann.bbox_image?.x},${ann.bbox_image?.y},${ann.bbox_image?.w},${ann.bbox_image?.h},0,${ann.attributes?.role},${ann.attributes?.jersey},${ann.attributes?.team === 'left' ? 1 : ann.attributes?.team === 'right' ? 0 : -1}`
+            `${ann.image_id.substring(5)},${ann.track_id},${ann.bbox_image?.x},${ann.bbox_image?.y},${ann.bbox_image?.w},${ann.bbox_image?.h},0,${ann.attributes?.role},${ann.attributes?.jersey},${ann.attributes?.color},${ann.attributes?.team === 'left' ? 1 : ann.attributes?.team === 'right' ? 0 : -1}`
             ).join('\n')
           // Handle JSON data if needed
         } else {
@@ -115,6 +115,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
             score: 0, // No score provided in the JSON, so default to 0
             role: ann.attributes?.role,
             jersey_number: parseInt(ann.attributes?.jersey, 10),
+            color: ann.attributes?.color,
             // Convert team string ("left" or "right") to a number (0 for left, 1 for right)
             team: ann.attributes?.team === 'left' ? 1 : ann.attributes?.team === 'right' ? 0 : -1,
           }));
@@ -165,7 +166,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                   score: parseFloat(score),
                   role: role,
                   jersey_number: parseInt(jersey_number, 10),
-                  jersey_color: jersey_color, // New field added
+                  color: jersey_color, // New field added
                   team: parseInt(team, 10),
               };
           } else {

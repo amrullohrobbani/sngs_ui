@@ -85,7 +85,7 @@ import { DataItem as VelocityData } from "@/context/DataContext";
     filter: 'Savitzky-Golay' | 'moving average' = 'Savitzky-Golay',
     window: number = 7,
     polyorder: number = 1,
-    maxSpeed: number = 500
+    maxSpeed: number = 12
   ): Promise<VelocityData[]> {
     // Remove any existing velocity data
     const team = removePlayerVelocities(teamData);

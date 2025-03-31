@@ -4,7 +4,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react'
 import { DataItem } from './DataContext'
 import { useSettings } from './SettingsContext'
-import { getFolders } from '@/hooks/get-folders'
 import { getFile } from '@/hooks/get-file'
 
 interface AnnotationContextType {
@@ -35,6 +34,7 @@ export interface Annotation {
     role: string;
     jersey: string;
     team: string;
+    color?: string;
   };
 }
 

@@ -14,7 +14,7 @@ import {
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
 import clsx from 'clsx';
-import { analyzeTeamTendencies } from '@/lib/utils';
+import { analyzeTeamTendencies, getMostFrequentColorByTeam, computeTeamAccuracy } from '@/lib/utils';
 
 interface ImageWithBoundingBoxesProps {
   src: string;
@@ -268,15 +268,17 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
                 ))
             }
             
-            <div className="absolute bottom-0 w-full justify-center">
+            <div className="absolute bottom-0 w-full justify-center bg-blue-900 opacity-70 text-sm">
                 {(() => {
                     const tendencies = analyzeTeamTendencies(data);
+                    // const leftRight = getMostFrequentColorByTeam(data)
+                    const accuracy = computeTeamAccuracy(annotations || [], data || [])
                     return (
                         <div className='grid grid-cols-2 text-white w-full px-16'>
                             <p>Left Team Tendency: {tendencies.leftTeamTendency} {tendencies.leftTeamAverageVx.toFixed(2)}</p>
                             <p>Right Team Tendency: {tendencies.rightTeamTendency} {tendencies.rightTeamAverageVx.toFixed(2)}</p>
-                            {/* <p>Actual Left Team: {tendencies.actualLeftTeam}</p>
-                            <p>Actual Right Team: {tendencies.actualRightTeam}</p> */}
+                            {/* <p>Accuracy: {accuracy.overallAccuracy.toFixed(2)} %</p> */}
+                            <p>Matching Accuracy: {(accuracy.matchingMetrics && Object.values(accuracy.matchingMetrics).reduce((sum, value) => sum + value.accuracy, 0) / Object.values(accuracy.matchingMetrics).length).toFixed(2)}%</p>
                         </div>
                     );
                 })()}
