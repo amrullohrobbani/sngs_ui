@@ -23,6 +23,8 @@ export interface DataItem {
   team: number
   vx?: number; // Velocity in x direction
   vy?: number; // Velocity in y direction
+  image_vx?: number; // Velocity in x direction
+  image_vy?: number; // Velocity in y direction
   speed?: number; // Total speed
 }
 
@@ -175,7 +177,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           }
         }).filter((item: null) => item !== null); // Remove any null values
         
-        const finalData =  await calcPlayerVelocities(parsedData, true, 'moving average', 12)
+        const finalData =  await calcPlayerVelocities(parsedData, true, 'moving average', 15)
         setData(finalData)
       } catch (error) {
         console.error('Error fetching or parsing data:', error)

@@ -9,6 +9,7 @@ export type SettingsItem = {
   trackingLineGTTracklet: boolean
   minimap: boolean
   arrowVelocity: boolean
+  idSwitching: boolean
   folder: string
   frame: number
   [key: string]: boolean | string | number
@@ -30,11 +31,12 @@ type SettingsProviderProps = {
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<SettingsItem>({
     predictionTracklet: true,
-    groundTruthTracklet: true,
+    groundTruthTracklet: false,
     trackingLinePredictionTracklet: false,
     trackingLineGTTracklet: false,
     arrowVelocity: false,
     minimap: false,
+    idSwitching: false,
     folder: '',
     frame: 0
   })

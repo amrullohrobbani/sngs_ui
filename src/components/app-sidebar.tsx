@@ -45,6 +45,10 @@ const data = {
       label: 'Minimap',
     },
     {
+      id: 'idSwitching',
+      label: 'Switching ID'
+    },
+    {
       id: 'arrowVelocity',
       label: 'Velocity Arrow',
     }

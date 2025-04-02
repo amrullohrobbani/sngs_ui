@@ -13,8 +13,35 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import clsx from 'clsx';
-import { analyzeTeamTendencies, getMostFrequentColorByTeam, computeTeamAccuracy } from '@/lib/utils';
+import { assignTeamPlots, computeTeamAccuracy } from '@/lib/utils';
+import CroppedImagesGrid from './CroppedImage';
+import { Checkbox } from './ui/checkbox';
 
 interface ImageWithBoundingBoxesProps {
   src: string;
@@ -26,6 +53,10 @@ interface ImageWithBoundingBoxesProps {
 export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: ImageWithBoundingBoxesProps) {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+    const [attributes, setAttributes] = useState<"role" | "color" | "jersey_number" | "team">("role")
+    const [tracklet, setTracklet] = useState(0)
+    const [open, setOpen] = useState(false)
+    const [activate750, setActivate750] = useState(false)
     const {
         isSelected,
         isGroundTruthSelected
@@ -135,7 +166,93 @@ export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: Ima
                 </ResizablePanelGroup>
             </div>
         )}
-
+        {(containerSize.width > 0 && settings.idSwitching) && (
+            <div className="absolute w-full h-full overflow-scroll bg-slate-900/80 top-0 left-0 rounded-lg">
+                <div className="flex p-5 gap-5 fixed z-1 bg-slate-900/80 w-[71%]">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline">{attributes.charAt(0).toUpperCase() + attributes.slice(1)}</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                            <DropdownMenuLabel>Attributes</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={attributes} onValueChange={(value) => setAttributes(value as "role" | "color" | "jersey_number" | "team")}>
+                                <DropdownMenuRadioItem value="role">Role</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="jersey_number">Jersey Number</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="color">Jersey Color</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="team">Team</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-[200px] justify-between"
+                            >
+                            {tracklet
+                                ? [...new Set(data.map(item => item.tracklet_id))].find((tracklet_id) => tracklet_id === Number(tracklet))
+                                : "Select tracklet_id..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                            <Command>
+                            <CommandInput placeholder="Search tracklet_id..." />
+                            <CommandList>
+                                <CommandEmpty>No tracklet_id found.</CommandEmpty>
+                                <CommandGroup>
+                                {[...new Set(data.map(item => item.tracklet_id))].map((tracklet_id) => (
+                                    <CommandItem
+                                        key={tracklet_id}
+                                        value={tracklet_id.toString()}
+                                        onSelect={(currentValue) => {
+                                            setTracklet(Number(currentValue) === tracklet ? 0 : Number(currentValue))
+                                            setOpen(false)
+                                        }}
+                                    >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            tracklet === tracklet_id ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {tracklet_id}
+                                    </CommandItem>
+                                ))}
+                                </CommandGroup>
+                            </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="terms"
+                            checked={Boolean(activate750)}
+                            onClick={() => setActivate750(!activate750)}
+                        />
+                        <label
+                            htmlFor="terms"
+                            className="text-white text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                            Activate Gap Frame
+                        </label>
+                    </div>
+                </div>
+                <div className='w-full p-5 pt-20 flex'>
+                    <CroppedImagesGrid 
+                        key={tracklet + "-" + attributes + "-" + activate750}
+                        trackletId={tracklet}
+                        imageUrlTemplate={"/data" + settings.folder + "/img1/{frame}.jpg"}
+                        data={data} 
+                        attribute={attributes}
+                        activate750={activate750}
+                    />
+                </div>
+            </div>
+        )}
       </div>
     );
 };
@@ -268,16 +385,14 @@ export function Minimap({ src, boxes, gtdata, currentIndex, ...props }: MinimapP
                 ))
             }
             
-            <div className="absolute bottom-0 w-full justify-center bg-blue-900 opacity-70 text-sm">
+            <div className="absolute bottom-0 w-full justify-center bg-blue-900 opacity-70 text-sm hidden">
                 {(() => {
-                    const tendencies = analyzeTeamTendencies(data);
-                    // const leftRight = getMostFrequentColorByTeam(data)
                     const accuracy = computeTeamAccuracy(annotations || [], data || [])
+                    const teamAssigment = assignTeamPlots(data)
                     return (
                         <div className='grid grid-cols-2 text-white w-full px-16'>
-                            <p>Left Team Tendency: {tendencies.leftTeamTendency} {tendencies.leftTeamAverageVx.toFixed(2)}</p>
-                            <p>Right Team Tendency: {tendencies.rightTeamTendency} {tendencies.rightTeamAverageVx.toFixed(2)}</p>
-                            {/* <p>Accuracy: {accuracy.overallAccuracy.toFixed(2)} %</p> */}
+                            <p>Team Assignment (Left):<br /> {teamAssigment.leftPlotTitle}</p>
+                            <p>Team Assignment (Right):<br /> {teamAssigment.rightPlotTitle}</p>
                             <p>Matching Accuracy: {(accuracy.matchingMetrics && Object.values(accuracy.matchingMetrics).reduce((sum, value) => sum + value.accuracy, 0) / Object.values(accuracy.matchingMetrics).length).toFixed(2)}%</p>
                         </div>
                     );

@@ -23,86 +23,6 @@ export function getPreviousElements<T>(arr: T[], currentIndex: number, n: number
   }
 }
 
-export function analyzeTeamTendencies(players: DataItem[]) {
-  // Step 1: Group players by team
-  const groupedByTeam = players.reduce((acc: { left: number[]; right: number[] }, player) => {
-    if (player.team === 1 || player.team === 0) {
-      const teamKey = player.team === 1 ? "left" : "right";
-      if (player.vx !== undefined) {
-        acc[teamKey].push(player.vx);
-      }
-    }
-    return acc;
-  }, { left: [], right: [] });
-
-  // Step 2: Calculate the average vx for each team
-  const calculateAverageVx = (vxValues: number[]) => {
-    const totalVx = vxValues.reduce((sum, vx) => sum + vx, 0);
-    return totalVx / vxValues.length;
-  };
-
-  const leftTeamAverageVx = calculateAverageVx(groupedByTeam.left);
-  const rightTeamAverageVx = calculateAverageVx(groupedByTeam.right);
-
-  // Step 3: Determine which team is actually moving left or right
-  const leftTeamTendency = leftTeamAverageVx > 0 ? "right" : "left";
-  const rightTeamTendency = rightTeamAverageVx > 0 ? "right" : "left";
-
-  // Step 4: Determine the actual "left" and "right" team based on tendencies
-  const actualLeftTeam = leftTeamAverageVx > rightTeamAverageVx ? "left" : "right";
-  const actualRightTeam = actualLeftTeam === "left" ? "right" : "left";
-
-  return {
-    leftTeamAverageVx,
-    rightTeamAverageVx,
-    leftTeamTendency,
-    rightTeamTendency,
-    actualLeftTeam,
-    actualRightTeam
-  };
-}
-
-export function getMostFrequentColorByTeam(data: DataItem[]): { left: string, right: string } {
-  const colorCount = {
-    left: {} as Record<string, number>,
-    right: {} as Record<string, number>
-  };
-
-  // Loop through each prediction and count the colors based on team
-  data.forEach((prediction) => {
-    const { team, color } = prediction;
-    if (team === 1 || team === 0) {
-      const teamKey = team === 1 ? "left" : "right";
-      if (color) {
-        if (!colorCount[teamKey][color]) {
-          colorCount[teamKey][color] = 0;
-        }
-        colorCount[teamKey][color]++;
-      }
-    }
-  });
-
-  // Function to find the most frequent color
-  const getMostFrequentColor = (team: "left" | "right") => {
-    let mostFrequentColor = "";
-    let maxCount = 0;
-    
-    Object.entries(colorCount[team]).forEach(([color, count]) => {
-      if (count > maxCount) {
-        mostFrequentColor = color;
-        maxCount = count;
-      }
-    });
-    
-    return mostFrequentColor;
-  };
-
-  return {
-    left: getMostFrequentColor("left"),
-    right: getMostFrequentColor("right")
-  };
-}
-
 interface AccuracyResults {
   frameAccuracies: { [frame: string]: number };
   overallAccuracy: number;
@@ -261,4 +181,56 @@ export function computeTeamAccuracy(
     overallWrong,
     matchingMetrics, // New return value: per-frame matching accuracy & confusion matrix.
   };
+}
+
+export function assignTeamPlots(data: DataItem[]): { leftPlotTeam: 'left' | 'right'; rightPlotTeam: 'left' | 'right'; leftPlotTitle: string; rightPlotTitle: string;} {
+  // Filter players for each team (only players are considered)
+  const leftPlayers = data.filter(
+    (item) => item.team === 1 && item.role === 'player'
+  );
+  const rightPlayers = data.filter(
+    (item) => item.team === 0 && item.role === 'player'
+  );
+// Guard against division by zero if no players exist in a team
+if (leftPlayers.length === 0 || rightPlayers.length === 0) {
+  console.warn("One of the teams has no players. Defaulting to original assignment.");
+  return { 
+    leftPlotTeam: 'left', 
+    rightPlotTeam: 'right', 
+    leftPlotTitle: 'Team Left', 
+    rightPlotTitle: 'Team Right'
+  };
+}
+
+  // Calculate the mean x coordinate for each team
+  const leftMean = leftPlayers.reduce(
+    (sum, player) => sum + player.x_pitch,
+    0
+  ) / leftPlayers.length;
+
+  const rightMean = rightPlayers.reduce(
+    (sum, player) => sum + player.x_pitch,
+    0
+  ) / rightPlayers.length;
+
+  let leftPlotTeam: 'left' | 'right';
+  let rightPlotTeam: 'left' | 'right';
+  let leftPlotTitle: string;
+  let rightPlotTitle: string;
+
+  // In most pitch coordinate systems, a lower x value means more to the left.
+  if (leftMean < rightMean) {
+    leftPlotTeam = 'left';
+    rightPlotTeam = 'right';
+    leftPlotTitle = `Team Left (mean x: ${leftMean.toFixed(2)})`;
+    rightPlotTitle = `Team Right (mean x: ${rightMean.toFixed(2)})`;
+  } else {
+    // Swap assignment if team labeled 'left' is actually positioned to the right
+    leftPlotTeam = 'right';
+    rightPlotTeam = 'left';
+    leftPlotTitle = `Team Right (mean x: ${rightMean.toFixed(2)})`;
+    rightPlotTitle = `Team Left (mean x: ${leftMean.toFixed(2)})`;
+  }
+
+  return { leftPlotTeam, rightPlotTeam, leftPlotTitle, rightPlotTitle };
 }
