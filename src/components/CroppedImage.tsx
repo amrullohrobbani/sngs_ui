@@ -300,28 +300,36 @@ interface CroppedImage {
           </div>
         ) : (
           // Display grid for the single tracklet
-          <div className="grid grid-cols-40 gap-1">
-            {croppedImages.map((item, index) => (
-              <div key={index} className="relative">
-                {item.placeholder ? (
-                  <div className="bg-gray-400 w-full h-20 flex items-center justify-center text-white" />
-                ) : (
-                  <>
-                    <img src={item.src} alt={`Cropped image ${item.frame}`} className="w-full h-20" />
-                    {item.overlayColor && (
-                      <div
-                        className="absolute inset-0"
-                        style={{ backgroundColor: item.overlayColor, opacity: 0.4 }}
-                      />
-                    )}
-                  </>
-                )}
-                <span className="absolute text-xs bottom-0 left-0 text-white">
-                  {item.frame}
-                </span>
-              </div>
-            ))}
-          </div>
+          <>
+            {(() => {
+              const group = data?.find((obj) => obj.tracklet_id == trackletId);
+              return (
+                <h3 className="font-semibold text-white">Tracklet {group?.tracklet_id} • Team {group?.team === 1 ? "Left" : group?.team === 0 ? "Right" : "-"} • {group?.role ? group?.role?.charAt(0).toUpperCase() + group?.role?.slice(1) : ""} • JN {group?.jersey_number}</h3>
+              );
+            })()}
+            <div className="grid grid-cols-40 gap-1">
+              {croppedImages.map((item, index) => (
+                <div key={index} className="relative">
+                  {item.placeholder ? (
+                    <div className="bg-gray-400 w-full h-20 flex items-center justify-center text-white" />
+                  ) : (
+                    <>
+                      <img src={item.src} alt={`Cropped image ${item.frame}`} className="w-full h-20" />
+                      {item.overlayColor && (
+                        <div
+                          className="absolute inset-0"
+                          style={{ backgroundColor: item.overlayColor, opacity: 0.4 }}
+                        />
+                      )}
+                    </>
+                  )}
+                  <span className="absolute text-xs bottom-0 left-0 text-white">
+                    {item.frame}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     );
