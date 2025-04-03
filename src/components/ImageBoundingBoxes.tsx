@@ -57,6 +57,7 @@ export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: Ima
     const [tracklet, setTracklet] = useState(0)
     const [open, setOpen] = useState(false)
     const [activate750, setActivate750] = useState(false)
+    const [activateAllTracklet, setActivateAllTracklet] = useState(false)
     const {
         isSelected,
         isGroundTruthSelected
@@ -229,26 +230,49 @@ export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: Ima
                     </Popover>
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id="terms"
+                            id="activate750"
                             checked={Boolean(activate750)}
-                            onClick={() => setActivate750(!activate750)}
+                            onClick={() => {
+                                setActivate750(!activate750)
+                                if (activate750 == false) {
+
+                                } 
+                            }}
                         />
                         <label
-                            htmlFor="terms"
+                            htmlFor="activate750"
                             className="text-white text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Activate Gap Frame
                         </label>
                     </div>
+                    { activate750 && (
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="useTrackletSettings"
+                                checked={Boolean(activateAllTracklet)}
+                                onClick={() => {
+                                    setActivateAllTracklet(!activateAllTracklet)
+                                }}
+                            />
+                            <label
+                                htmlFor="useTrackletSettings"
+                                className="text-white text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                Activate All Tracklet
+                            </label>
+                        </div>
+                    )}
                 </div>
                 <div className='w-full p-5 pt-20 flex'>
                     <CroppedImagesGrid 
-                        key={tracklet + "-" + attributes + "-" + activate750}
+                        key={tracklet + "-" + attributes + "-" + activate750 + activateAllTracklet}
                         trackletId={tracklet}
                         imageUrlTemplate={"/data" + settings.folder + "/img1/{frame}.jpg"}
                         data={data} 
                         attribute={attributes}
                         activate750={activate750}
+                        useSettingTracklet={activateAllTracklet}
                     />
                 </div>
             </div>
