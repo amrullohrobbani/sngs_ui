@@ -273,6 +273,7 @@ export function ImageWithBoundingBoxes({ src, boxes, gtdata, currentIndex }: Ima
                         attribute={attributes}
                         activate750={activate750}
                         useSettingTracklet={activateAllTracklet}
+                        gtData={annotations}
                     />
                 </div>
             </div>

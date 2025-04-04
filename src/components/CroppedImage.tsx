@@ -3,6 +3,7 @@ import { DataItem } from "@/context/DataContext";
 import { useTrackletContext } from "@/context/TrackletContext";
 import clsx from "clsx";
 import { Progress } from "./ui/progress";
+import { useSettings } from "@/context/SettingsContext";
 
 interface CroppedImage {
     src: string;
@@ -15,6 +16,7 @@ interface CroppedImage {
     trackletId: number;
     imageUrlTemplate: string; // e.g. "https://example.com/images/frame-{frame}.jpg"
     data: DataItem[];
+    gtData?: DataItem[];
     attribute: "role" | "color" | "jersey_number" | "team";
     activate750: boolean
     useSettingTracklet: boolean;
@@ -33,6 +35,7 @@ interface CroppedImage {
     trackletId,
     imageUrlTemplate,
     data,
+    gtData,
     attribute,
     activate750,
     useSettingTracklet,
@@ -41,8 +44,10 @@ interface CroppedImage {
     const [croppedImages, setCroppedImages] = useState<CroppedImage[]>([]);
     // When useSettingTracklet is true, we store groups of images by tracklet id
     const [groupedCroppedImages, setGroupedCroppedImages] = useState<TrackletGroup[]>([]);
+    const [groupedGTCroppedImages, setGroupedGTCroppedImages] = useState<TrackletGroup[]>([]);
 
-    const { isSelected } = useTrackletContext() 
+    const { isSelected, isGroundTruthSelected } = useTrackletContext() 
+    const { settings } = useSettings()
     const [progress, setProgress] = useState<number>(0)
   
     useEffect(() => {
@@ -134,9 +139,9 @@ interface CroppedImage {
   
         if (activate750) {
           const sortedData = [...groupData].sort((a, b) => a.frame - b.frame);
-          const minFrame = sortedData[0].frame;
+          const minFrame = 1;
           const totalFrames = 750;
-          const maxFrame = minFrame + totalFrames - 1;
+          const maxFrame = totalFrames;
           const promises: Promise<CroppedImage>[] = [];
           for (let f = minFrame; f <= maxFrame; f++) {
             const dataItem = sortedData.find(item => item.frame === f);
@@ -178,22 +183,42 @@ interface CroppedImage {
       if (useSettingTracklet) {
         // Group the data by tracklet_id.
         const groups: Record<number, DataItem[]> = {};
+        const groupsGT: Record<number, DataItem[]> = {};
         data.forEach(item => {
           if (!groups[item.tracklet_id]) {
             groups[item.tracklet_id] = [];
           }
           groups[item.tracklet_id].push(item);
         });
+        if(settings.groundTruthTracklet) {
+          gtData?.forEach(item => {
+            if (!groupsGT[item.tracklet_id]) {
+              groupsGT[item.tracklet_id] = [];
+            }
+            groupsGT[item.tracklet_id].push(item);
+          });
+        }
         // Calculate total tasks across all groups.
         Object.values(groups).forEach(groupData => {
           totalTasks += activate750 ? 750 : groupData.length;
         });
+        if(settings.groundTruthTracklet) {
+          Object.values(groupsGT).forEach(groupData => {
+            totalTasks += activate750 ? 750 : groupData.length;
+          });
+        }
         const groupPromises = Object.values(groups).map(groupData =>
+          processGroupWithProgress(groupData)
+        );
+        const groupGTPromises = Object.values(groupsGT).map(groupData =>
           processGroupWithProgress(groupData)
         );
         Promise.all(groupPromises)
           .then(results => setGroupedCroppedImages(results))
           .catch(err => console.error('Error processing tracklet groups:', err));
+        Promise.all(groupGTPromises)
+          .then(results => setGroupedGTCroppedImages(results))
+          .catch(err => console.error('Error processing GT tracklet groups:', err));
       } else {
         // Non-grouped: process only the selected trackletId.
         const filteredData = data.filter(item => item.tracklet_id === trackletId);
@@ -290,6 +315,40 @@ interface CroppedImage {
                         )}
                         <span className="absolute text-xs bottom-0 left-0 text-white">
                           {item.frame}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            }
+            {
+              groupedGTCroppedImages.map((group) => (
+                <div key={group.trackletId} className={
+                  clsx(
+                    "mb-2 flex flex-col",
+                    { 'hidden': (!isGroundTruthSelected(group.trackletId)) }
+                  )
+                }>
+                  <h3 className="font-semibold text-white">GT Tracklet {group.trackletId} • Team {group.team === 1 ? "Left" : group.team === 0 ? "Right" : "-"} • {group.role.charAt(0).toUpperCase() + group.role.slice(1)} • JN {group.jersey_number}</h3>
+                  <div className="flex flex-nowrap gap-1 w-full">
+                    {group.croppedImages.map((item, index) => (
+                      <div key={index} className="relative flex w-8 min-w-8">
+                        {item.placeholder ? (
+                          <div className="bg-gray-400 w-full h-20 flex items-center justify-center text-white object-contain" />
+                        ) : (
+                          <>
+                            <img src={item.src} alt={`Cropped image ${item.frame}`} className="w-full h-20 object-contain" />
+                            {item.overlayColor && (
+                              <div
+                                className="absolute inset-0"
+                                style={{ backgroundColor: item.overlayColor, opacity: 0.4 }}
+                              />
+                            )}
+                          </>
+                        )}
+                        <span className="absolute text-xs bottom-0 left-0 text-white">
+                          {index + 1}
                         </span>
                       </div>
                     ))}
