@@ -6,6 +6,7 @@ import { useSettings } from './SettingsContext'
 import { getFile } from '@/hooks/get-file'
 import { Annotation } from './AnnotationContext'
 import { calcPlayerVelocities } from '@/hooks/get-velocity'
+import { normalizePath } from '@/lib/utils'
 
 export interface DataItem {
   frame: number         // consider keeping it as a string if leading zeros matter
@@ -51,7 +52,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         // Fetch the text file from the public folder (e.g. /data.txt)
         const track_file_data = await getFile(`public/data${settings.folder}`, 'track')
         const fileExtension = track_file_data ? track_file_data.split('.').pop()?.toLowerCase() : null;
-        const response = await fetch((track_file_data || '').split('/').slice(1).join('/'))
+        const response = await fetch(normalizePath(track_file_data || ''))
         let text = null
         if (fileExtension === 'txt') {
           text = await response.text()
@@ -69,7 +70,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         const rows = text.split('\n').filter((row: string) => row.trim() !== '')
         const court_file_data = await getFile(`public/data/${settings.folder}`, fileExtension === 'txt'? 'court': 'track')
         const fileExtensionCourt = court_file_data ? court_file_data.split('.').pop()?.toLowerCase() : null;
-        const response_court = await fetch((court_file_data || '').split('/').slice(1).join('/'))
+        const response_court = await fetch(normalizePath(court_file_data || ''))
         
         let parsedData_court: DataItem[] = [];
         if (fileExtensionCourt === 'txt') {

@@ -234,3 +234,11 @@ if (leftPlayers.length === 0 || rightPlayers.length === 0) {
 
   return { leftPlotTeam, rightPlotTeam, leftPlotTitle, rightPlotTitle };
 }
+
+export function normalizePath(inputPath: string): string {
+  const hasLeadingSlash = inputPath.startsWith("/");
+  const cleanedPath = inputPath.replace(/\\/g, "/"); // Convert Windows `\` to `/`
+  const normalized = cleanedPath.split("/").slice(1).join("/");
+
+  return hasLeadingSlash ? `/${normalized}` : normalized;
+}
